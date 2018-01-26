@@ -5,7 +5,9 @@ node requestbinCurl.js http://requestb.in/1234asdf?inspect#13mgnv -p
 node requestbinCurl.js requestb.in/1234asdf`;
 
 
-const http = require('http');
+//const http = require('http');
+const http = require('follow-redirects').http;
+
 
 // get the url form the command line arguments
 const url         = process.argv[2];
@@ -114,7 +116,7 @@ function getRBBinRequests(rbBinId, cb) {
   const endpoint = `/bins/${rbBinId}/requests`;
   callRBAPI(endpoint, (err, result) => {
     if (err) return cb(err);
-    if (result.res.statusCode !== 200 || !Array.isArray(result.body)) {
+    if (!Array.isArray(result.body)) {
       return cb(null, new Error(`Unrecognized response from RequestBin API.\nURL: ${result.url}\nStatus: ${result.res.statusCode}\n${result.bodyStr}`));
     }
     
@@ -138,6 +140,7 @@ function getRBRequest(rbBinId, rbRequestId, cb) {
   
 function callRBAPI(endpoint, cb) {
   const url = `http://requestb.in/api/v1${endpoint}`;
+  console.log(url)
   const req = http.get(url, res => {
     res.setEncoding('utf8');
     
